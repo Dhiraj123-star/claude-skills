@@ -1,5 +1,5 @@
 name: Weather Checker
-description: Retrieves current weather for a given location.
+description: Retrieves current weather for a given location
 parameters:
     - name: location
     type: string
