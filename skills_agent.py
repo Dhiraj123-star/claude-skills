@@ -120,7 +120,7 @@ class SkillsAgent:
         
         return {"error": f"Skill {skill_name} not found"}
     
-    def chat(self, user_message, max_turns=5):
+    async def chat(self, user_message, max_turns=5):
         """Main chat loop with tool use"""
         messages = [{"role": "user", "content": user_message}]
         tools = self._skills_to_tools()
@@ -169,19 +169,7 @@ class SkillsAgent:
                     if hasattr(block, 'text'):
                         print(f"Claude: {block.text}\n")
                 
-                return response
+                return response.content[0].text
         
         print("Max turns reached")
-        return response
-
-
-# Example usage
-if __name__ == "__main__":
-    agent = SkillsAgent()
-    
-    # Test with weather query
-    agent.chat("What's the weather in New Delhi today?")
-    
-    # You can also try:
-    # agent.chat("What's the weather like in London UK?")
-    # agent.chat("Compare the weather in Tokyo and New York")
+        return response.content[0].text
