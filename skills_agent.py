@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import json
 import importlib.util
 from pathlib import Path
-from anthropic import Anthropic
+from anthropic import AsyncAnthropic
 
 load_dotenv()
 
@@ -11,7 +11,7 @@ ANTHROPIC_API_KEY=os.getenv("ANTHROPIC_API_KEY")
 
 class SkillsAgent:
     def __init__(self, skills_dir="skills"):
-        self.client = Anthropic(api_key=ANTHROPIC_API_KEY)
+        self.client = AsyncAnthropic(api_key=ANTHROPIC_API_KEY)
         self.skills_dir = Path(skills_dir)
         self.skills = self._load_skills()
     
@@ -128,7 +128,7 @@ class SkillsAgent:
         print(f"Loaded {len(tools)} skills: {[t['name'] for t in tools]}\n")
         
         for turn in range(max_turns):
-            response = self.client.messages.create(
+            response = await self.client.messages.create(
                 model="claude-sonnet-4-5-20250929",
                 max_tokens=1024,
                 tools=tools,

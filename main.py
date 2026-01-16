@@ -1,10 +1,17 @@
 from  fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from skills_agent import SkillsAgent
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 app = FastAPI(
-    title="Claude Skills API"
+    title="Claude Skills API",
+    root_path="",
+    docs_url="/docs",
+    openapi_url= "/openapi.json"
 )
+
+# Add Middleware to trust headers like X-Forwarded-Proto from Nginx
+app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
 
 agent = SkillsAgent()
 
