@@ -1,7 +1,6 @@
+# Skills Agent (FastAPI + Docker + Nginx + CI/CD Edition)
 
-# Skills Agent (FastAPI + Docker + CI/CD Edition)
-
-A lightweight Python AI Agent that dynamically loads and executes "Skills" as tools using the Anthropic Messages API. This version is production-ready, featuring a **FastAPI** web layer, **Docker** containerization, and **GitHub Actions** for automated deployment.
+A lightweight Python AI Agent that dynamically loads and executes "Skills" as tools using the Anthropic Messages API. This version is production-hardened with a **FastAPI** backend, **Nginx** reverse proxy, **Docker** orchestration, and **GitHub Actions** for CI/CD.
 
 ## 🚀 Core Functionality
 
@@ -10,19 +9,22 @@ The agent operates on a **Discovery & Execution** pattern:
 1. **Skill Discovery**: On startup, it scans the `skills/` directory for modular logic.
 2. **Tool Mapping**: Markdown definitions in `SKILL.md` are converted into JSON schemas for Claude.
 3. **Autonomous Loop**: Claude decides which tool to call; the agent executes local Python code and returns the result.
-4. **Web API**: FastAPI exposes an `/ask` endpoint for remote interaction.
-5. **Containerized**: Fully Dockerized with multi-stage builds and non-root security.
-6. **CI/CD**: Automatically builds and pushes images to **Docker Hub** on every push to `main`.
+4. **Web API**: FastAPI exposes a production-ready `/ask` endpoint.
+5. **Reverse Proxy**: **Nginx** handles incoming traffic on port 80, providing security and header forwarding for the API.
+6. **Containerized**: Fully Dockerized with multi-stage builds and non-root security.
+7. **CI/CD**: Automatically builds and pushes images to **Docker Hub** on every push to `main`.
 
 ## 📁 Project Structure
 
 ```text
 .
 ├── .github/workflows/    # CI/CD Pipeline (Docker Hub Push)
-├── main.py               # FastAPI entry point
-├── skills_agent.py       # Core Agent logic (Async)
+├── nginx/
+│   └── default.conf      # Nginx Reverse Proxy Configuration
+├── main.py               # FastAPI entry point & Proxy Middleware
+├── skills_agent.py       # Core Agent logic (AsyncAnthropic enabled)
 ├── Dockerfile            # Multi-stage, non-root production image
-├── docker-compose.yml    # Service orchestration
+├── docker-compose.yml    # Full stack orchestration (App + Proxy)
 ├── .dockerignore         # Build optimization
 ├── .env                  # API Keys (Excluded from Docker image)
 └── skills/               # Custom capabilities folder
@@ -39,7 +41,7 @@ The agent operates on a **Discovery & Execution** pattern:
 1. **Install Dependencies**: `pip install -r requirements.txt`
 2. **Launch**: `uvicorn main:app --reload`
 
-### Option B: Docker (Recommended)
+### Option B: Docker Production (Recommended)
 
 1. **Configure Environment**: Add your `ANTHROPIC_API_KEY` to the `.env` file.
 2. **Build and Run**:
@@ -49,18 +51,18 @@ docker-compose up --build -d
 ```
 
 
+*The API is now accessible on port **80** (via Nginx).*
 
 ## 🤖 CI/CD Deployment
 
-This project uses GitHub Actions to automate image publishing.
+Automated image publishing via GitHub Actions:
 
 * **Target**: `dhiraj918106/claude-skills:latest`
 * **Trigger**: Every push to the `main` branch.
-* **Setup**: Requires `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` in GitHub Secrets.
 
 ## 🧪 Interact via API
 
-Send a POST request to `http://localhost:8000/ask`:
+Send a POST request to `http://localhost/ask` (Nginx handles the routing to the agent):
 
 ```json
 {
@@ -68,6 +70,8 @@ Send a POST request to `http://localhost:8000/ask`:
 }
 
 ```
+
+*Access API Documentation at `http://localhost/docs`.*
 
 ## 🧩 How to Add a New Skill
 
@@ -79,8 +83,8 @@ Send a POST request to `http://localhost:8000/ask`:
 
 ### Why this approach works
 
-* **Production Secure**: Runs as a non-privileged `appuser` inside the container.
-* **Optimized**: Multi-stage Docker builds keep the final image size minimal.
-* **Automated**: GitHub Actions ensures your Docker Hub image is always up to date with your code.
+* **Production Secure**: Uses Nginx as a buffer and runs the Python app as a non-privileged user.
+* **Non-Blocking**: Implements `AsyncAnthropic` to ensure high performance under load.
+* **Swagger Friendly**: Configured with Proxy Header Middleware to ensure `/docs` load correctly behind a reverse proxy.
 
 ---
