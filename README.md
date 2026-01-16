@@ -1,7 +1,7 @@
 
-# Skills Agent (FastAPI + Docker Edition)
+# Skills Agent (FastAPI + Docker + CI/CD Edition)
 
-A lightweight Python AI Agent that dynamically loads and executes "Skills" as tools using the Anthropic Messages API. This version is production-ready, featuring a **FastAPI** web layer and **Docker** containerization.
+A lightweight Python AI Agent that dynamically loads and executes "Skills" as tools using the Anthropic Messages API. This version is production-ready, featuring a **FastAPI** web layer, **Docker** containerization, and **GitHub Actions** for automated deployment.
 
 ## 🚀 Core Functionality
 
@@ -12,11 +12,13 @@ The agent operates on a **Discovery & Execution** pattern:
 3. **Autonomous Loop**: Claude decides which tool to call; the agent executes local Python code and returns the result.
 4. **Web API**: FastAPI exposes an `/ask` endpoint for remote interaction.
 5. **Containerized**: Fully Dockerized with multi-stage builds and non-root security.
+6. **CI/CD**: Automatically builds and pushes images to **Docker Hub** on every push to `main`.
 
 ## 📁 Project Structure
 
 ```text
 .
+├── .github/workflows/    # CI/CD Pipeline (Docker Hub Push)
 ├── main.py               # FastAPI entry point
 ├── skills_agent.py       # Core Agent logic (Async)
 ├── Dockerfile            # Multi-stage, non-root production image
@@ -47,7 +49,14 @@ docker-compose up --build -d
 ```
 
 
-3. **Check Logs**: `docker-compose logs -f`
+
+## 🤖 CI/CD Deployment
+
+This project uses GitHub Actions to automate image publishing.
+
+* **Target**: `dhiraj918106/claude-skills:latest`
+* **Trigger**: Every push to the `main` branch.
+* **Setup**: Requires `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` in GitHub Secrets.
 
 ## 🧪 Interact via API
 
@@ -65,7 +74,6 @@ Send a POST request to `http://localhost:8000/ask`:
 1. **Folder**: Create `skills/your_skill/`.
 2. **Metadata**: Define name/params in `SKILL.md`.
 3. **Logic**: Write your function in `your_skill.py`.
-4. **Hot Reload**: If using Docker Compose with volumes, the agent can pick up new skills on container restart.
 
 ---
 
@@ -73,6 +81,6 @@ Send a POST request to `http://localhost:8000/ask`:
 
 * **Production Secure**: Runs as a non-privileged `appuser` inside the container.
 * **Optimized**: Multi-stage Docker builds keep the final image size minimal.
-* **Modular**: Skills remain decoupled from the core API logic.
+* **Automated**: GitHub Actions ensures your Docker Hub image is always up to date with your code.
 
 ---
