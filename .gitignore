@@ -24,3 +24,8 @@ __pycache__/
 dist/
 build/
 *.egg-info/
+# Certificates files
+nginx/certs/
+# SSL keys 
+*.key
+*.crt
